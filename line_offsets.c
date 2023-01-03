@@ -36,8 +36,8 @@ extern void init_lambda_line_offsets(lambda_line_offsets_t *o) {
 extern void lambda_line_offsets_add_start_offset(lambda_line_offsets_t *os,
                                                  size_t start_offset) {
   os->start_offsets_len++;
-  os->start_offsets =
-      realloc(os->start_offsets, os->start_offsets_len * sizeof(size_t));
+  os->start_offsets = (size_t *)realloc(os->start_offsets,
+                                        os->start_offsets_len * sizeof(size_t));
   os->start_offsets[os->start_offsets_len - 1] = start_offset;
 }
 
@@ -45,6 +45,6 @@ extern void lambda_line_offsets_add_end_offset(lambda_line_offsets_t *os,
                                                size_t end_offset) {
   os->end_offsets_len++;
   os->end_offsets =
-      realloc(os->end_offsets, os->end_offsets_len * sizeof(size_t));
+      (size_t *)realloc(os->end_offsets, os->end_offsets_len * sizeof(size_t));
   os->end_offsets[os->end_offsets_len - 1] = end_offset;
 }

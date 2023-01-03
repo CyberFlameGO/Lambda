@@ -38,4 +38,7 @@ extern char *lambda_format(const char *format, ...);
 
 extern char *lambda_formatv(const char *format, va_list args);
 
+extern char *lambda_string_replace(char *original, char *pattern,
+                                   char *replacement);
+
 #endif /* _LAMBDA_UTILS_H_ */

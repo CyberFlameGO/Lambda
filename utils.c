@@ -73,3 +73,47 @@ extern char *lambda_formatv(const char *format, va_list args) {
   va_end(args0);
   return s;
 }
+
+// From
+// https://stackoverflow.com/questions/779875/what-function-is-to-replace-a-substring-from-a-string-in-c
+extern char *lambda_string_replace(char *original, char *pattern,
+                                   char *replacement) {
+  size_t replen = strlen(replacement);
+  size_t patlen = strlen(pattern);
+  size_t orilen = strlen(original);
+
+  size_t patcnt = 0;
+  char *oriptr;
+  char *patloc;
+
+  // find how many times the pattern occurs in the original string
+  for (oriptr = original; patloc = strstr(oriptr, pattern);
+       oriptr = patloc + patlen) {
+    patcnt++;
+  }
+
+  {
+    // allocate memory for the new string
+    size_t retlen = orilen + patcnt * (replen - patlen);
+    char *returned = malloc(retlen + 1);
+
+    if (returned != NULL) {
+      // copy the original string,
+      // replacing all the instances of the pattern
+      char *retptr = returned;
+      for (oriptr = original; patloc = strstr(oriptr, pattern);
+           oriptr = patloc + patlen) {
+        size_t const skplen = patloc - oriptr;
+        // copy the section until the occurence of the pattern
+        strncpy(retptr, oriptr, skplen);
+        retptr += skplen;
+        // copy the replacement
+        strncpy(retptr, replacement, replen);
+        retptr += replen;
+      }
+      // copy the rest of the string.
+      strcpy(retptr, oriptr);
+    }
+    return returned;
+  }
+}

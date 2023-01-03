@@ -32,8 +32,11 @@
 
 static void lambda_lexer_advance(lambda_lexer_t *l) {
   if (current_chr(l) == '\n') {
+    lambda_line_offsets_add_end_offset(l->line_offsets, l->location->index - 1);
     l->location->line++;
     l->location->column = 0;
+    lambda_line_offsets_add_start_offset(l->line_offsets,
+                                         l->location->index + 1);
   } else {
     l->location->column++;
   }
@@ -48,6 +51,9 @@ extern void init_lambda_lexer(lambda_lexer_t *l, const char *filename,
   l->source_len = strlen(source);
 
   l->line_offsets = malloc(sizeof(lambda_line_offsets_t));
+  init_lambda_line_offsets(l->line_offsets);
+
+  lambda_line_offsets_add_start_offset(l->line_offsets, 0);
 
   l->location = malloc(sizeof(lambda_char_location_t));
   init_lambda_char_location(l->location,
@@ -172,6 +178,7 @@ extern void lambda_lexer_next_token(lambda_token_t *t, lambda_lexer_t *l) {
     return;
   }
   case '\0': {
+    lambda_line_offsets_add_end_offset(l->line_offsets, l->location->index);
     eof_token();
     return;
   }
@@ -203,6 +210,7 @@ extern void lambda_lexer_next_token(lambda_token_t *t, lambda_lexer_t *l) {
   if (l->error_handling_enabled) {
     lambda_block_location_t *error_location =
         malloc(sizeof(lambda_block_location_t));
+    error_location->end = malloc(sizeof(lambda_char_location_t));
 
     lambda_char_location_t *current_location_copy =
         malloc(sizeof(lambda_char_location_t));

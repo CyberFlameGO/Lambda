@@ -45,6 +45,11 @@ int main(int argc, const char *argv[]) {
   lambda_lexer_t *l = malloc(sizeof(lambda_lexer_t));
   init_lambda_lexer(l, filepath, source);
 
+  lambda_error_handler_t *h = malloc(sizeof(lambda_error_handler_t));
+  init_lambda_error_handler(h, filepath, source);
+
+  lambda_lexer_enable_error_handling(l, h);
+
   bool finished = false;
 
   for (;;) {
@@ -52,9 +57,10 @@ int main(int argc, const char *argv[]) {
 
     lambda_lexer_next_token(t, l);
 
-    printf("tok(%d, %s, %ld:%ld-%ld:%ld)\n", t->kind, t->literal,
+    printf("tok(%d, %s, %ld:%ld(%ld)-%ld:%ld(%ld))\n", t->kind, t->literal,
            t->location->start->line, t->location->start->column,
-           t->location->end->line, t->location->end->column);
+           t->location->start->index, t->location->end->line,
+           t->location->end->column, t->location->end->index);
 
     if (t->kind == LAMBDA_EOF_TOKEN_KIND) {
       finished = true;
@@ -67,6 +73,8 @@ int main(int argc, const char *argv[]) {
     free(t);
 
     if (finished) {
+      lambda_error_handler_print_errors(h);
+
       free(l->location);
       free(l);
       free(source);
