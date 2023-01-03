@@ -75,6 +75,8 @@ extern void lambda_lexer_enable_error_handling(lambda_lexer_t *l,
 
 static void lambda_lexer_next_identifier_token(lambda_token_t *t,
                                                lambda_lexer_t *l) {
+  lambda_token_kind_t k = LAMBDA_IDENTIFIER_TOKEN_KIND;
+
   lambda_char_location_t *start_location =
       malloc(sizeof(lambda_char_location_t));
   copy_lambda_char_location(l->location, start_location);
@@ -97,7 +99,15 @@ static void lambda_lexer_next_identifier_token(lambda_token_t *t,
   lambda_block_location_t *bl = malloc(sizeof(lambda_block_location_t));
   init_lambda_block_location(bl, start_location, end_location);
 
-  init_lambda_token(t, LAMBDA_IDENTIFIER_TOKEN_KIND, bl, identifier_buffer);
+  if (strcmp(identifier_buffer, "in") == 0) {
+    k = LAMBDA_IN_KEYWORD_TOKEN_KIND;
+  } else if (strcmp(identifier_buffer, "let") == 0) {
+    k = LAMBDA_LET_KEYWORD_TOKEN_KIND;
+  } else if (strcmp(identifier_buffer, "lambda") == 0) {
+    k = LAMBDA_LAMBDA_TOKEN_KIND;
+  }
+
+  init_lambda_token(t, k, bl, identifier_buffer);
 }
 
 #define one_char_token(c, k)                                                   \

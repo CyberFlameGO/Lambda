@@ -23,3 +23,71 @@
  */
 
 #include "parser.h"
+
+static void lambda_parser_consume_token(lambda_parser_t *p);
+
+static void lambda_parser_consume_remaining_tokens(lambda_parser_t *p);
+
+static void lambda_parser_parse_statement(lambda_ast_statement_t *s,
+                                          lambda_parser_t *p);
+
+static void lambda_parser_parse_let_statement(lambda_ast_statement_t *s,
+                                              lambda_parser_t *p);
+
+static void lambda_parser_parse_expression_statement(lambda_ast_statement_t *s,
+                                                     lambda_parser_t *p);
+
+static void lambda_parser_parse_unary(lambda_ast_expression_t *e,
+                                      lambda_parser_t *p);
+
+static void lambda_parser_parse_lambda(lambda_ast_expression_t *e,
+                                       lambda_parser_t *p);
+
+static void lambda_parser_parse_parenthesised(lambda_ast_expression_t *e,
+                                              lambda_parser_t *p);
+
+static void lambda_parser_parse_apply(lambda_ast_expression_t *e,
+                                      lambda_parser_t *p);
+
+extern void init_lambda_parser(lambda_parser_t *p, lambda_lexer_t *l) {
+  p->lexer = l;
+  p->error_handler = l->error_handler;
+  p->current_token = malloc(sizeof(lambda_token_t));
+  p->peek_token = malloc(sizeof(lambda_token_t));
+  lambda_parser_consume_token(p);
+  lambda_parser_consume_token(p);
+}
+
+extern void lambda_parser_parse(lambda_ast_t *ast, lambda_parser_t *p);
+
+static void lambda_parser_consume_token(lambda_parser_t *p) {
+  p->current_token = p->peek_token;
+  lambda_lexer_next_token(p->peek_token, p->lexer);
+}
+
+static void lambda_parser_consume_remaining_tokens(lambda_parser_t *p) {
+  while (p->current_token != LAMBDA_EOF_TOKEN_KIND) {
+    lambda_parser_consume_token(p);
+  }
+}
+
+static void lambda_parser_parse_statement(lambda_ast_statement_t *s,
+                                          lambda_parser_t *p) {}
+
+static void lambda_parser_parse_let_statement(lambda_ast_statement_t *s,
+                                              lambda_parser_t *p) {}
+
+static void lambda_parser_parse_expression_statement(lambda_ast_statement_t *s,
+                                                     lambda_parser_t *p) {}
+
+static void lambda_parser_parse_unary(lambda_ast_expression_t *e,
+                                      lambda_parser_t *p) {}
+
+static void lambda_parser_parse_lambda(lambda_ast_expression_t *e,
+                                       lambda_parser_t *p) {}
+
+static void lambda_parser_parse_parenthesised(lambda_ast_expression_t *e,
+                                              lambda_parser_t *p) {}
+
+static void lambda_parser_parse_apply(lambda_ast_expression_t *e,
+                                      lambda_parser_t *p) {}

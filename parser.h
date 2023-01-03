@@ -25,4 +25,20 @@
 #ifndef _LAMBDA_PARSER_H_
 #define _LAMBDA_PARSER_H_
 
+#include "ast.h"
+#include "lexer.h"
+
+typedef struct lambda_parser {
+  lambda_error_handler_t *error_handler;
+
+  lambda_lexer_t *lexer;
+
+  lambda_lexer_t *current_token;
+  lambda_lexer_t *peek_token;
+} lambda_parser_t;
+
+extern void init_lambda_parser(lambda_parser_t *p, lambda_lexer_t *l);
+
+extern void lambda_parser_parse(lambda_ast_t *ast, lambda_parser_t *p);
+
 #endif /* _LAMBDA_PARSER_H_ */
