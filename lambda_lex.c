@@ -74,6 +74,9 @@ int main(int argc, const char *argv[]) {
 
     if (finished) {
       lambda_error_handler_print_errors(h);
+      lambda_error_handler_clean_errors(h);
+      free(h);
+      lambda_line_offsets_free(l->line_offsets);
 
       free(l->location);
       free(l);

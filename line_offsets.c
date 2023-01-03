@@ -48,3 +48,9 @@ extern void lambda_line_offsets_add_end_offset(lambda_line_offsets_t *os,
       (size_t *)realloc(os->end_offsets, os->end_offsets_len * sizeof(size_t));
   os->end_offsets[os->end_offsets_len - 1] = end_offset;
 }
+
+extern void lambda_line_offsets_free(lambda_line_offsets_t *o) {
+  free(o->start_offsets);
+  free(o->end_offsets);
+  free(o);
+}

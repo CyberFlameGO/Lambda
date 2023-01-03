@@ -96,6 +96,7 @@ extern char *lambda_string_replace(char *original, char *pattern,
     // allocate memory for the new string
     size_t retlen = orilen + patcnt * (replen - patlen);
     char *returned = malloc(retlen + 1);
+    returned[retlen] = '\0';
 
     if (returned != NULL) {
       // copy the original string,
@@ -103,7 +104,7 @@ extern char *lambda_string_replace(char *original, char *pattern,
       char *retptr = returned;
       for (oriptr = original; patloc = strstr(oriptr, pattern);
            oriptr = patloc + patlen) {
-        size_t const skplen = patloc - oriptr;
+        size_t skplen = patloc - oriptr;
         // copy the section until the occurence of the pattern
         strncpy(retptr, oriptr, skplen);
         retptr += skplen;

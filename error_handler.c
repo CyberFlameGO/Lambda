@@ -55,22 +55,24 @@ extern void lambda_error_handler_add_error(lambda_error_handler_t *h,
 
   init_lambda_error(error, message, location);
 
-  h->errors = realloc(h->errors, h->errors_len * sizeof(lambda_error_t));
+  h->errors = (lambda_error_t **)realloc(
+      h->errors, h->errors_len * sizeof(lambda_error_t *));
   h->errors[h->errors_len - 1] = error;
 }
 
 static void
 lambda_error_handler_print_error_codeblock(lambda_error_handler_t *h,
                                            lambda_error_t *e) {
-  char *line_number_str = lambda_format("%d", e->location->start->line);
+  char *line_number_str = lambda_format("%ld", e->location->start->line);
   size_t line_number_str_size = strlen(line_number_str);
+  free(line_number_str);
 
   char *spaces_before_bar = calloc(line_number_str_size + 3, 1);
   for (size_t i = 0; i < line_number_str_size + 2; i++) {
     spaces_before_bar[i] = ' ';
   }
 
-  fprintf(stderr, "%s|\n %d | ", spaces_before_bar, e->location->start->line);
+  fprintf(stderr, "%s|\n %ld | ", spaces_before_bar, e->location->start->line);
 
   size_t line_size =
       h->line_offsets->end_offsets[e->location->start->line - 1] -
@@ -83,7 +85,9 @@ lambda_error_handler_print_error_codeblock(lambda_error_handler_t *h,
   line_buffer[line_size] = '\0';
 
   char *new_buffer = lambda_string_replace(line_buffer, "\t", " ");
+  free(line_buffer);
   fprintf(stderr, "%s\n", new_buffer);
+  free(new_buffer);
 
   fprintf(stderr, "%s|", spaces_before_bar);
 
@@ -102,6 +106,8 @@ lambda_error_handler_print_error_codeblock(lambda_error_handler_t *h,
   }
 
   fprintf(stderr, "\n\n");
+
+  free(spaces_before_bar);
 }
 
 static void lambda_error_handler_print_error(lambda_error_handler_t *h,

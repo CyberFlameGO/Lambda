@@ -43,4 +43,6 @@ extern void lambda_line_offsets_add_start_offset(lambda_line_offsets_t *os,
 extern void lambda_line_offsets_add_end_offset(lambda_line_offsets_t *os,
                                                size_t end_offset);
 
+extern void lambda_line_offsets_free(lambda_line_offsets_t *o);
+
 #endif /* _LAMBDA_LINE_OFFSETS_H_ */
