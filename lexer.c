@@ -47,11 +47,24 @@ extern void init_lambda_lexer(lambda_lexer_t *l, const char *filename,
   l->source = source;
   l->source_len = strlen(source);
 
+  l->line_offsets = malloc(sizeof(lambda_line_offsets_t));
+
   l->location = malloc(sizeof(lambda_char_location_t));
   init_lambda_char_location(l->location,
                             /* index */ 0,
                             /* line */ 1,
                             /* column */ 0);
+
+  l->error_handler = (void *)0;
+  l->error_handling_enabled = false;
+}
+
+extern void lambda_lexer_enable_error_handling(lambda_lexer_t *l,
+                                               lambda_error_handler_t *h) {
+  l->error_handler = h;
+  l->error_handling_enabled = true;
+
+  lambda_error_handler_set_line_offsets_ptr(h, l->line_offsets);
 }
 
 static void lambda_lexer_next_identifier_token(lambda_token_t *t,
@@ -61,6 +74,7 @@ static void lambda_lexer_next_identifier_token(lambda_token_t *t,
   copy_lambda_char_location(l->location, start_location);
 
   while ((current_chr(l) >= 'a' && current_chr(l) <= 'z') ||
+         (current_chr(l) >= 'A' && current_chr(l) <= 'Z') ||
          (current_chr(l) == '_') ||
          (current_chr(l) >= '0' && current_chr(l) <= '9')) {
     lambda_lexer_advance(l);
@@ -163,7 +177,8 @@ extern void lambda_lexer_next_token(lambda_token_t *t, lambda_lexer_t *l) {
   }
   default: {
     if (current_chr(l) == '_' ||
-        (current_chr(l) >= 'a' && current_chr(l) <= 'z')) {
+        (current_chr(l) >= 'a' && current_chr(l) <= 'z') ||
+        (current_chr(l) >= 'A' && current_chr(l) <= 'Z')) {
       lambda_lexer_next_identifier_token(t, l);
       return;
     } else if (current_chr(l) == (char)206 &&
@@ -183,6 +198,23 @@ extern void lambda_lexer_next_token(lambda_token_t *t, lambda_lexer_t *l) {
       return;
     }
   }
+  }
+
+  if (l->error_handling_enabled) {
+    lambda_block_location_t *error_location =
+        malloc(sizeof(lambda_block_location_t));
+
+    lambda_char_location_t *current_location_copy =
+        malloc(sizeof(lambda_char_location_t));
+    copy_lambda_char_location(l->location, current_location_copy);
+
+    init_lambda_block_location_from_char_location(error_location,
+                                                  current_location_copy);
+
+    lambda_error_handler_add_error(
+        l->error_handler,
+        lambda_format("unexpected character '%c'", current_chr(l)),
+        error_location);
   }
 
   one_char_token(current_chr(l), LAMBDA_ERROR_TOKEN_KIND);

@@ -22,54 +22,38 @@
    IN THE SOFTWARE.
  */
 
-#include "utils.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _LAMBDA_ERROR_HANDLER_H_
+#define _LAMBDA_ERROR_HANDLER_H_
 
-extern void lambda_substring(char *src, char *dest, size_t start, size_t size) {
-  memcpy(dest, &src[start], size);
-  dest[size] = '\0';
-}
+#include "error.h"
+#include "line_offsets.h"
+#include <stdbool.h>
 
-extern char *lambda_read_file(const char *filename) {
-  FILE *file = fopen(filename, "r");
+typedef struct lambda_error_handler {
+  const char *filename;
+  char *source;
 
-  if (!file)
-    return NULL;
+  lambda_line_offsets_t *line_offsets;
 
-  fseek(file, 0, SEEK_END);
+  lambda_error_t **errors;
+  size_t errors_len;
 
-  size_t buffer_len = ftell(file);
-  char *buffer = calloc(buffer_len, buffer_len);
+  bool ok;
+} lambda_error_handler_t;
 
-  fseek(file, 0, SEEK_SET);
+extern void init_lambda_error_handler(lambda_error_handler_t *h,
+                                      const char *filename, char *source);
 
-  if (buffer)
-    fread(buffer, 1, buffer_len, file);
+extern void
+lambda_error_handler_set_line_offsets_ptr(lambda_error_handler_t *h,
+                                          lambda_line_offsets_t *line_offsets);
 
-  fclose(file);
-  return buffer;
-}
+extern void lambda_error_handler_add_error(lambda_error_handler_t *h,
+                                           char *message,
+                                           lambda_block_location_t *location);
 
-extern char *lambda_format(const char *format, ...) {
-  va_list args;
-  va_start(args, format);
+extern void lambda_error_handler_print_errors(lambda_error_handler_t *h);
 
-  char *s = lambda_formatv(format, args);
+extern void lambda_error_handler_clean_errors(lambda_error_handler_t *h);
 
-  va_end(args);
-  return s;
-}
-
-extern char *lambda_formatv(const char *format, va_list args) {
-  va_list args0;
-  va_copy(args0, args);
-
-  size_t len = vsnprintf(NULL, 0, format, args) + 1;
-  char *s = malloc(len);
-  vsnprintf(s, len, format, args0);
-
-  va_end(args0);
-  return s;
-}
+#endif /* _LAMBDA_ERROR_HANDLER_H_ */

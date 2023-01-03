@@ -22,54 +22,25 @@
    IN THE SOFTWARE.
  */
 
-#include "utils.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _LAMBDA_LINE_OFFSETS_H_
+#define _LAMBDA_LINE_OFFSETS_H_
 
-extern void lambda_substring(char *src, char *dest, size_t start, size_t size) {
-  memcpy(dest, &src[start], size);
-  dest[size] = '\0';
-}
+#include <stddef.h>
 
-extern char *lambda_read_file(const char *filename) {
-  FILE *file = fopen(filename, "r");
+typedef struct lambda_line_offsets {
+  size_t *start_offsets;
+  size_t start_offsets_len;
 
-  if (!file)
-    return NULL;
+  size_t *end_offsets;
+  size_t end_offsets_len;
+} lambda_line_offsets_t;
 
-  fseek(file, 0, SEEK_END);
+extern void init_lambda_line_offsets(lambda_line_offsets_t *o);
 
-  size_t buffer_len = ftell(file);
-  char *buffer = calloc(buffer_len, buffer_len);
+extern void lambda_line_offsets_add_start_offset(lambda_line_offsets_t *os,
+                                                 size_t start_offset);
 
-  fseek(file, 0, SEEK_SET);
+extern void lambda_line_offsets_add_end_offset(lambda_line_offsets_t *os,
+                                               size_t end_offset);
 
-  if (buffer)
-    fread(buffer, 1, buffer_len, file);
-
-  fclose(file);
-  return buffer;
-}
-
-extern char *lambda_format(const char *format, ...) {
-  va_list args;
-  va_start(args, format);
-
-  char *s = lambda_formatv(format, args);
-
-  va_end(args);
-  return s;
-}
-
-extern char *lambda_formatv(const char *format, va_list args) {
-  va_list args0;
-  va_copy(args0, args);
-
-  size_t len = vsnprintf(NULL, 0, format, args) + 1;
-  char *s = malloc(len);
-  vsnprintf(s, len, format, args0);
-
-  va_end(args0);
-  return s;
-}
+#endif /* _LAMBDA_LINE_OFFSETS_H_ */

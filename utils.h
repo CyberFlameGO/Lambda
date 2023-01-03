@@ -25,10 +25,17 @@
 #ifndef _LAMBDA_UTILS_H_
 #define _LAMBDA_UTILS_H_
 
+#include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern void lambda_substring(char *src, char *dest, size_t start, size_t size);
 
 extern char *lambda_read_file(const char *filename);
+
+extern char *lambda_format(const char *format, ...);
+
+extern char *lambda_formatv(const char *format, va_list args);
 
 #endif /* _LAMBDA_UTILS_H_ */

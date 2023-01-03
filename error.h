@@ -22,54 +22,17 @@
    IN THE SOFTWARE.
  */
 
-#include "utils.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _LAMBDA_ERROR_H_
+#define _LAMBDA_ERROR_H_
 
-extern void lambda_substring(char *src, char *dest, size_t start, size_t size) {
-  memcpy(dest, &src[start], size);
-  dest[size] = '\0';
-}
+#include "location.h"
 
-extern char *lambda_read_file(const char *filename) {
-  FILE *file = fopen(filename, "r");
+typedef struct lambda_error {
+  char *message;
+  lambda_block_location_t *location;
+} lambda_error_t;
 
-  if (!file)
-    return NULL;
+extern void init_lambda_error(lambda_error_t *e, char *message,
+                              lambda_block_location_t *location);
 
-  fseek(file, 0, SEEK_END);
-
-  size_t buffer_len = ftell(file);
-  char *buffer = calloc(buffer_len, buffer_len);
-
-  fseek(file, 0, SEEK_SET);
-
-  if (buffer)
-    fread(buffer, 1, buffer_len, file);
-
-  fclose(file);
-  return buffer;
-}
-
-extern char *lambda_format(const char *format, ...) {
-  va_list args;
-  va_start(args, format);
-
-  char *s = lambda_formatv(format, args);
-
-  va_end(args);
-  return s;
-}
-
-extern char *lambda_formatv(const char *format, va_list args) {
-  va_list args0;
-  va_copy(args0, args);
-
-  size_t len = vsnprintf(NULL, 0, format, args) + 1;
-  char *s = malloc(len);
-  vsnprintf(s, len, format, args0);
-
-  va_end(args0);
-  return s;
-}
+#endif /* _LAMBDA_ERROR_H_ */
