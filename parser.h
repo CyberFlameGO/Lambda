@@ -33,8 +33,8 @@ typedef struct lambda_parser {
 
   lambda_lexer_t *lexer;
 
-  lambda_lexer_t *current_token;
-  lambda_lexer_t *peek_token;
+  lambda_token_t *current_token;
+  lambda_token_t *peek_token;
 } lambda_parser_t;
 
 extern void init_lambda_parser(lambda_parser_t *p, lambda_lexer_t *l);

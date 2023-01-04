@@ -172,7 +172,7 @@ extern void lambda_lexer_next_token(lambda_token_t *t, lambda_lexer_t *l) {
     return;
   }
   case '.': {
-    one_char_token('.', LAMBDA_PERIOD_TOKEN_KIND);
+    one_char_token('.', LAMBDA_PERIOD_OR_RIGHTARROW_TOKEN_KIND);
     return;
   }
   case '$': {
@@ -181,6 +181,10 @@ extern void lambda_lexer_next_token(lambda_token_t *t, lambda_lexer_t *l) {
   }
   case '=': {
     one_char_token('=', LAMBDA_EQUAL_TOKEN_KIND);
+    return;
+  }
+  case ';': {
+    one_char_token(';', LAMBDA_SEMICOLON_TOKEN_KIND);
     return;
   }
   case '\\': {
@@ -211,7 +215,7 @@ extern void lambda_lexer_next_token(lambda_token_t *t, lambda_lexer_t *l) {
       s[0] = '-';
       s[1] = '>';
       s[2] = '\0';
-      two_char_token(s, LAMBDA_RIGHT_ARROW_TOKEN_KIND);
+      two_char_token(s, LAMBDA_PERIOD_OR_RIGHTARROW_TOKEN_KIND);
       return;
     }
   }
